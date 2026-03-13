@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dead by Daylight — Survivor Challenge Roulette</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Share+Tech+Mono&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111116;
+    --surface2: #1a1a22;
+    --border: #2a2a35;
+    --text: #e8e6f0;
+    --text-dim: #8888a0;
+    --accent: #e63946;
+    --accent-glow: rgba(230, 57, 70, 0.4);
+    --gold: #f0a500;
+    --green: #4ecdc4;
+    --purple: #a855f7;
+    --orange: #ff6b35;
+  }
+ 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  /* Fog background effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(230, 57, 70, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 80%, rgba(78, 205, 196, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+ 
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+ 
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-family: 'Creepster', cursive;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-shadow: 0 0 40px var(--accent-glow), 0 2px 0 #1a0a0c;
+    line-height: 1.1;
+  }
+  .header .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .header .count {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 12px;
+    opacity: 0.6;
+  }
+ 
+  /* FILTERS */
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 36px;
+  }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .filter-btn.active[data-diff="easy"] { background: var(--green); border-color: var(--green); box-shadow: 0 0 16px rgba(78,205,196,0.3); }
+  .filter-btn.active[data-diff="medium"] { background: var(--gold); border-color: var(--gold); color: #111; box-shadow: 0 0 16px rgba(240,165,0,0.3); }
+  .filter-btn.active[data-diff="hard"] { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 16px rgba(255,107,53,0.3); }
+  .filter-btn.active[data-diff="nightmare"] { background: var(--purple); border-color: var(--purple); box-shadow: 0 0 16px rgba(168,85,247,0.3); }
+ 
+  /* SPIN BUTTON */
+  .spin-section { text-align: center; margin-bottom: 40px; }
+  .spin-btn {
+    font-family: 'Creepster', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    padding: 18px 56px;
+    background: linear-gradient(135deg, var(--accent), #c1121f);
+    border: 2px solid var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 30px var(--accent-glow);
+    position: relative;
+    overflow: hidden;
+  }
+  .spin-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .spin-btn:hover::after { transform: translateX(100%); }
+  .spin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px var(--accent-glow);
+  }
+  .spin-btn:active { transform: scale(0.97); }
+ 
+  /* RESULT CARD */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .result-card[data-diff="easy"]::before { background: var(--green); box-shadow: 0 0 20px rgba(78,205,196,0.4); }
+  .result-card[data-diff="medium"]::before { background: var(--gold); box-shadow: 0 0 20px rgba(240,165,0,0.4); }
+  .result-card[data-diff="hard"]::before { background: var(--orange); box-shadow: 0 0 20px rgba(255,107,53,0.4); }
+  .result-card[data-diff="nightmare"]::before { background: var(--purple); box-shadow: 0 0 20px rgba(168,85,247,0.4); }
+ 
+  .result-number {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .result-title {
+    font-family: 'Creepster', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .result-desc {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.65;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+  .result-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .tag-diff {
+    color: #fff;
+  }
+  .tag-diff[data-d="easy"] { background: var(--green); color: #0a0a0c; }
+  .tag-diff[data-d="medium"] { background: var(--gold); color: #0a0a0c; }
+  .tag-diff[data-d="hard"] { background: var(--orange); }
+  .tag-diff[data-d="nightmare"] { background: var(--purple); }
+  .tag-type {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+ 
+  /* HISTORY */
+  .history-section {
+    margin-top: 48px;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+  }
+  .history-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    opacity: 0;
+    animation: fadeSlide 0.3s forwards;
+  }
+  .history-item .h-num {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    min-width: 24px;
+  }
+  .history-item .h-name {
+    flex: 1;
+    font-weight: 600;
+  }
+  .history-item .h-diff {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+  .h-diff[data-d="easy"] { background: rgba(78,205,196,0.15); color: var(--green); }
+  .h-diff[data-d="medium"] { background: rgba(240,165,0,0.15); color: var(--gold); }
+  .h-diff[data-d="hard"] { background: rgba(255,107,53,0.15); color: var(--orange); }
+  .h-diff[data-d="nightmare"] { background: rgba(168,85,247,0.15); color: var(--purple); }
+ 
+  .clear-btn {
+    display: block;
+    margin: 16px auto 0;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 20px;
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+  }
+  .clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+ 
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+ 
+  /* Spinning animation */
+  .spinning .result-title {
+    animation: flicker 0.08s infinite;
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+ 
+  /* Mobile */
+  @media (max-width: 600px) {
+    .app { padding: 24px 14px 60px; }
+    .result-card { padding: 28px 20px; }
+    .spin-btn { padding: 14px 40px; font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+ 
+<script>
+const CHALLENGES = [
+  // ═══════════════════════════════════════════
+  //  EASY (50 challenges)
+  // ═══════════════════════════════════════════
+  // -- Gameplay --
+  { id: 1, name: "First Light", desc: "Repair a total of 2 generators in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 2, name: "Good Samaritan", desc: "Unhook 2 survivors in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 3, name: "Patch Up", desc: "Fully heal 2 other survivors in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 4, name: "Safe Haven", desc: "Perform 2 safe unhooks in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 5, name: "Treasure Hunter", desc: "Search 2 chests in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 6, name: "Stunning Exit", desc: "Stun the killer at least once with a pallet and escape the trial.", diff: "easy", type: "gameplay" },
+  { id: 7, name: "Bone Collector", desc: "Cleanse 2 totems (any type) in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 8, name: "Cooperative Spirit", desc: "Co-repair a generator with another survivor for at least 30 seconds total.", diff: "easy", type: "gameplay" },
+  { id: 9, name: "Glyph Seeker", desc: "Interact with a glyph during the trial.", diff: "easy", type: "gameplay" },
+  { id: 10, name: "Light Runner", desc: "Escape the trial through the exit gate (not the hatch).", diff: "easy", type: "gameplay" },
+  { id: 11, name: "Wiggle Free", desc: "Wiggle out of the killer's grasp at least once.", diff: "easy", type: "gameplay" },
+  { id: 12, name: "Window Athlete", desc: "Vault 10 windows during a single trial.", diff: "easy", type: "gameplay" },
+  { id: 13, name: "Quiet Escape", desc: "Escape the trial without being hooked more than once.", diff: "easy", type: "gameplay" },
+  // -- Loadout --
+  { id: 14, name: "Minimalist", desc: "Play with only 2 perks equipped (leave 2 slots empty).", diff: "easy", type: "loadout" },
+  { id: 15, name: "Flashlight Enjoyer", desc: "Bring a flashlight and use it to blind the killer at least once.", diff: "easy", type: "loadout" },
+  { id: 16, name: "Pharmacy Run", desc: "Equip Pharmacy. Open a chest and use the med-kit you find to heal yourself or a teammate.", diff: "easy", type: "loadout" },
+  { id: 17, name: "Inner Healing", desc: "Equip Inner Healing (Inner Strength). Cleanse a totem and use it to heal yourself.", diff: "easy", type: "loadout" },
+  { id: 18, name: "Bond Builder", desc: "Equip Bond. Find and heal a teammate you located using Bond's aura reading.", diff: "easy", type: "loadout" },
+  { id: 19, name: "Toolbox Technician", desc: "Bring a toolbox and use the entire charge during the trial.", diff: "easy", type: "loadout" },
+  { id: 20, name: "Déjà Vu Detective", desc: "Equip Déjà Vu and complete one of the 3 highlighted generators.", diff: "easy", type: "loadout" },
+  { id: 21, name: "Map Reader", desc: "Bring a map and reveal at least 3 auras with it.", diff: "easy", type: "loadout" },
+  { id: 22, name: "Kindred Heart", desc: "Equip Kindred. While a teammate is hooked, use the info to safely unhook them.", diff: "easy", type: "loadout" },
+  { id: 23, name: "Sprint Burst Start", desc: "Equip Sprint Burst. Use it within the first 30 seconds of the trial to get a positional advantage.", diff: "easy", type: "loadout" },
+  // -- Mixed --
+  { id: 24, name: "Distraction Duty", desc: "Equip a firecracker or flashbang. Use it to distract the killer and escape a chase.", diff: "easy", type: "mixed" },
+  { id: 25, name: "Spine Chill Zen", desc: "Equip Spine Chill. Leave a generator before the killer arrives at least twice using the perk's info.", diff: "easy", type: "mixed" },
+  { id: 26, name: "Borrowed Time Hero", desc: "Equip Borrowed Time. Unhook someone in the killer's terror radius safely.", diff: "easy", type: "mixed" },
+  { id: 27, name: "Plunderer's Heist", desc: "Equip Plunderer's Instinct. Loot 3 chests and escape with the best item you found.", diff: "easy", type: "mixed" },
+  { id: 28, name: "No Scratch Marks", desc: "Walk (don't run) for at least 60 cumulative seconds while within 20m of the killer.", diff: "easy", type: "gameplay" },
+  { id: 29, name: "Gate Opener", desc: "Be the one to open an exit gate (start and finish the interaction).", diff: "easy", type: "gameplay" },
+  { id: 30, name: "Self-Sufficient", desc: "Bring a med-kit and heal yourself at least once without any teammate's help.", diff: "easy", type: "loadout" },
+  // -- Meme --
+  { id: 31, name: "Tourist", desc: "Visit the basement, the shack, and the main building in one trial without being hooked.", diff: "easy", type: "meme" },
+  { id: 32, name: "Crouch Walker", desc: "Crouch for at least 45 cumulative seconds during the trial. Stealth is key.", diff: "easy", type: "meme" },
+  { id: 33, name: "Nodding Buddies", desc: "Find another survivor and nod at each other at least 3 times before doing anything else.", diff: "easy", type: "meme" },
+  { id: 34, name: "AFK Check", desc: "Stand completely still on a generator for 10 seconds when you first hear the terror radius. Then finish the gen.", diff: "easy", type: "meme" },
+  { id: 35, name: "Fashion Show", desc: "Equip the worst cosmetic combination you own. Own it. Escape.", diff: "easy", type: "meme" },
+  { id: 36, name: "Point Farmer", desc: "Get at least 20,000 bloodpoints in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 37, name: "Empathic Link", desc: "Equip Empathy. Locate an injured teammate using aura reading and go heal them.", diff: "easy", type: "mixed" },
+  { id: 38, name: "Lucky Break", desc: "Escape a trial using the hatch.", diff: "easy", type: "gameplay" },
+  { id: 39, name: "Pallet Town", desc: "Drop 5 pallets in a single trial.", diff: "easy", type: "gameplay" },
+  { id: 40, name: "Medic!", desc: "Bring a med-kit with add-ons and fully heal 2 survivors.", diff: "easy", type: "loadout" },
+  { id: 41, name: "Wake Up Call", desc: "Equip Wake Up. Open the exit gate while Wake Up is active.", diff: "easy", type: "mixed" },
+  { id: 42, name: "Calm Spirit Silence", desc: "Equip Calm Spirit. Walk past 3 crows without disturbing them.", diff: "easy", type: "mixed" },
+  { id: 43, name: "Gen Jockey Lite", desc: "Be present on a generator when it completes. Do this for 2 separate gens.", diff: "easy", type: "gameplay" },
+  { id: 44, name: "Altruist Starter", desc: "Take a protection hit for a teammate at least once.", diff: "easy", type: "gameplay" },
+  { id: 45, name: "Locker Lurker", desc: "Hide in a locker while the killer walks past within 8 meters. Survive.", diff: "easy", type: "gameplay" },
+  { id: 46, name: "Key Finder", desc: "Equip Plunderer's Instinct and try to find a key from a chest.", diff: "easy", type: "loadout" },
+  { id: 47, name: "Lightweight Runner", desc: "Equip Lightweight. Loop the killer for at least 20 seconds.", diff: "easy", type: "mixed" },
+  { id: 48, name: "Quick & Quiet Entry", desc: "Equip Quick & Quiet. Fast-vault into a locker to lose the killer.", diff: "easy", type: "mixed" },
+  { id: 49, name: "Prove Thyself Grind", desc: "Equip Prove Thyself. Co-op a gen with at least one other survivor until completion.", diff: "easy", type: "mixed" },
+  { id: 50, name: "Resilience Worker", desc: "Equip Resilience. Repair a generator while injured.", diff: "easy", type: "mixed" },
+ 
+  // ═══════════════════════════════════════════
+  //  MEDIUM (50 challenges)
+  // ═══════════════════════════════════════════
+  { id: 51, name: "Loop Master", desc: "Chase the killer for 60+ seconds in a single chase without going down.", diff: "medium", type: "gameplay" },
+  { id: 52, name: "Generator Rush", desc: "Repair 3 generators in a single trial (partial progress counts if you were majority contributor).", diff: "medium", type: "gameplay" },
+  { id: 53, name: "Pallet Stun Triple", desc: "Stun the killer with pallets 3 times in a single trial.", diff: "medium", type: "gameplay" },
+  { id: 54, name: "Unhook Under Pressure", desc: "Unhook a survivor while the killer is within 24 meters — and both of you survive for 30+ more seconds.", diff: "medium", type: "gameplay" },
+  { id: 55, name: "No Mither Survivor", desc: "Equip No Mither. Survive for at least 5 minutes in the trial.", diff: "medium", type: "loadout" },
+  { id: 56, name: "Sabo Squad", desc: "Bring a toolbox and sabotage 2 hooks in a single trial.", diff: "medium", type: "loadout" },
+  { id: 57, name: "Flashlight Save", desc: "Bring a flashlight and save a survivor from the killer's grasp with a blind.", diff: "medium", type: "loadout" },
+  { id: 58, name: "Head On Ambush", desc: "Equip Head On. Stun the killer by jumping out of a locker.", diff: "medium", type: "loadout" },
+  { id: 59, name: "The Healer", desc: "Heal a total of 4 health states in a single trial (self-heals count too).", diff: "medium", type: "gameplay" },
+  { id: 60, name: "Totem Destroyer", desc: "Cleanse or bless 4 totems in a single trial.", diff: "medium", type: "gameplay" },
+  { id: 61, name: "David King Energy", desc: "Equip Dead Hard, We're Gonna Live Forever, and No Mither. Get at least one protection hit.", diff: "medium", type: "mixed" },
+  { id: 62, name: "No Items Allowed", desc: "Play an entire trial without bringing or picking up any items.", diff: "medium", type: "loadout" },
+  { id: 63, name: "Boon Master", desc: "Equip 2 Boon perks. Bless at least 2 different totems in a single trial.", diff: "medium", type: "loadout" },
+  { id: 64, name: "End Game Clutch", desc: "Escape the trial during the End Game Collapse.", diff: "medium", type: "gameplay" },
+  { id: 65, name: "Windows of Opportunity", desc: "Equip Windows of Opportunity. Chain 3 different window vaults during a single chase.", diff: "medium", type: "mixed" },
+  { id: 66, name: "Distortion Agent", desc: "Equip Distortion. Avoid the killer's aura reading at least 3 times in a trial.", diff: "medium", type: "mixed" },
+  { id: 67, name: "Babysitter Duty", desc: "Equip Guardian (Babysitter). Unhook someone and watch them escape thanks to the scratch mark concealment.", diff: "medium", type: "mixed" },
+  { id: 68, name: "Decisive Moment", desc: "Equip Decisive Strike. Hit the skill check after being tunneled off hook.", diff: "medium", type: "mixed" },
+  { id: 69, name: "Blendette Classic", desc: "Play as Claudette in dark cosmetics. Escape without being chased for more than 15 seconds total.", diff: "medium", type: "meme" },
+  { id: 70, name: "Bill's Last Stand", desc: "Play as Bill. Use Unbreakable to pick yourself up at least once.", diff: "medium", type: "mixed" },
+  { id: 71, name: "For the People", desc: "Equip For the People. Use it to instantly heal a teammate in a critical moment.", diff: "medium", type: "loadout" },
+  { id: 72, name: "Breakout Artist", desc: "Equip Breakout. Help a carried survivor wiggle free by staying close.", diff: "medium", type: "mixed" },
+  { id: 73, name: "Deliverance", desc: "Equip Deliverance. Unhook another survivor first, then unhook yourself with the guaranteed escape.", diff: "medium", type: "mixed" },
+  { id: 74, name: "Chest Goblin", desc: "Equip Plunderer's Instinct + Ace in the Hole. Loot 3 chests and escape with the item.", diff: "medium", type: "loadout" },
+  { id: 75, name: "Iron Will Ninja", desc: "Equip Iron Will. Get chased while injured and lose the killer without using any pallet or window.", diff: "medium", type: "mixed" },
+  { id: 76, name: "Power Struggle", desc: "Equip Power Struggle + Flip-Flop. Try to stun the killer with Power Struggle at least once.", diff: "medium", type: "loadout" },
+  { id: 77, name: "Soulguard Second Chance", desc: "Equip Soul Guard. Pick yourself up or get the endurance hit after recovering from dying state.", diff: "medium", type: "mixed" },
+  { id: 78, name: "Exhaustion Roulette", desc: "Equip a random exhaustion perk (spin a wheel if needed). Get value from it at least twice.", diff: "medium", type: "loadout" },
+  { id: 79, name: "No Recovery", desc: "Play without any healing perks or items. Survive the trial.", diff: "medium", type: "loadout" },
+  { id: 80, name: "Late Night Shift", desc: "Equip Streetwise + Built to Last. Use every charge of your item, then regenerate and use more.", diff: "medium", type: "mixed" },
+  { id: 81, name: "Anti-Tunnel Package", desc: "Equip Decisive Strike + Off the Record. Survive being tunneled and escape the trial.", diff: "medium", type: "loadout" },
+  { id: 82, name: "Basement Rescue", desc: "Unhook someone from a basement hook and both survive for 60+ more seconds.", diff: "medium", type: "gameplay" },
+  { id: 83, name: "Bodyblock Hero", desc: "Take 2 protection hits for injured or carried survivors in a single trial.", diff: "medium", type: "gameplay" },
+  { id: 84, name: "Sole Survivor", desc: "Be the last survivor alive and escape through the hatch or exit gate.", diff: "medium", type: "gameplay" },
+  { id: 85, name: "No Perks, Med-Kit Only", desc: "Bring no perks at all. Bring a med-kit as your only lifeline. Escape the trial.", diff: "medium", type: "loadout" },
+  { id: 86, name: "Lithe Athlete", desc: "Equip Lithe. Trigger it at least 3 times during chases.", diff: "medium", type: "mixed" },
+  { id: 87, name: "Lockersmith", desc: "Enter 8 different lockers throughout the trial. Escape alive.", diff: "medium", type: "meme" },
+  { id: 88, name: "Hex Destroyer", desc: "Find and cleanse a Hex totem within the first 90 seconds of the trial.", diff: "medium", type: "gameplay" },
+  { id: 89, name: "Altruist Supreme", desc: "Unhook 3 different survivors in a single trial.", diff: "medium", type: "gameplay" },
+  { id: 90, name: "Balanced Landing Spot", desc: "Equip Balanced Landing. Find and use a drop spot during a chase to gain distance.", diff: "medium", type: "mixed" },
+  { id: 91, name: "Blast Mine Troll", desc: "Equip Blast Mine. Successfully blind the killer with it on a generator.", diff: "medium", type: "mixed" },
+  { id: 92, name: "Plot Twist Heal", desc: "Equip Plot Twist. Use it to fake your death and recover at a strategic moment.", diff: "medium", type: "mixed" },
+  { id: 93, name: "Champion of Light", desc: "Blind the killer 3 times in a single trial (flashlight, firecrackers, or perks).", diff: "medium", type: "gameplay" },
+  { id: 94, name: "Diversion Master", desc: "Equip Diversion (Pebble). Throw the pebble to misdirect the killer at least twice.", diff: "medium", type: "mixed" },
+  { id: 95, name: "Object of Obsession Dare", desc: "Equip Object of Obsession. Survive the trial knowing the killer can see you.", diff: "medium", type: "loadout" },
+  { id: 96, name: "Lucky Star", desc: "Equip Lucky Star. Hide in a locker to stop your blood trail and pools of blood. Lose the killer.", diff: "medium", type: "mixed" },
+  { id: 97, name: "We'll Make It Rescuer", desc: "Equip We'll Make It. Unhook someone and fully heal them before the speed boost expires.", diff: "medium", type: "mixed" },
+  { id: 98, name: "Quick Gambit Bait", desc: "Equip Quick Gambit. Get chased near a generator where a teammate is working to give them the speed boost.", diff: "medium", type: "mixed" },
+  { id: 99, name: "Poised Exit", desc: "Equip Poised. When a gen completes, use the scratch mark suppression to reposition or escape a chase.", diff: "medium", type: "mixed" },
+  { id: 100, name: "Urban Evasion Sneak", desc: "Equip Urban Evasion. Crouch-walk within the killer's terror radius for 30 cumulative seconds without being found.", diff: "medium", type: "mixed" },
+ 
+  // ═══════════════════════════════════════════
+  //  HARD (50 challenges)
+  // ═══════════════════════════════════════════
+  { id: 101, name: "Adept Escape", desc: "Escape using only the 3 unique perks of a random survivor (no other perks). Spin a wheel to pick the survivor.", diff: "hard", type: "loadout" },
+  { id: 102, name: "4-Man Out", desc: "All 4 survivors must escape the trial. You must unhook at least one teammate.", diff: "hard", type: "gameplay" },
+  { id: 103, name: "No Perk Escape", desc: "Equip zero perks. No items. Escape the trial.", diff: "hard", type: "loadout" },
+  { id: 104, name: "Sabo Save", desc: "Sabotage a hook right as the killer is carrying a survivor to it, forcing them to drop or go elsewhere.", diff: "hard", type: "gameplay" },
+  { id: 105, name: "Boil Over Basement", desc: "Equip Boil Over. Wiggle free while being carried to the basement.", diff: "hard", type: "mixed" },
+  { id: 106, name: "90-Second Chase", desc: "Loop the killer for 90+ seconds in a single chase without going down.", diff: "hard", type: "gameplay" },
+  { id: 107, name: "Double Flashlight Save", desc: "Get 2 flashlight saves in a single trial.", diff: "hard", type: "gameplay" },
+  { id: 108, name: "Zero Hook Escape", desc: "Escape the trial without being hooked a single time.", diff: "hard", type: "gameplay" },
+  { id: 109, name: "Gen Rush Demon", desc: "Repair 4 generators in a single trial.", diff: "hard", type: "gameplay" },
+  { id: 110, name: "Left Behind Hero", desc: "Equip Left Behind. Be the last survivor and find the hatch with the perk's help. Escape.", diff: "hard", type: "mixed" },
+  { id: 111, name: "No Mither Escape", desc: "Equip No Mither. Escape the trial while exposed and broken the whole game.", diff: "hard", type: "loadout" },
+  { id: 112, name: "Self-Care Only", desc: "Equip Self-Care as your only healing method. No med-kits, no teammates healing you. Heal yourself 3 times.", diff: "hard", type: "loadout" },
+  { id: 113, name: "5-Gen Chase", desc: "Get chased by the killer while 3+ generators get completed by your team.", diff: "hard", type: "gameplay" },
+  { id: 114, name: "Stun City", desc: "Stun the killer 5 times in one trial (pallets, Head On, flashbangs, etc.).", diff: "hard", type: "gameplay" },
+  { id: 115, name: "Invocation Gambit", desc: "Equip an Invocation perk. Complete the invocation in the basement and escape the trial.", diff: "hard", type: "loadout" },
+  { id: 116, name: "Full Stealth Build", desc: "Equip Iron Will + Urban Evasion + Calm Spirit + Lightweight. Escape without being chased for more than 20 total seconds.", diff: "hard", type: "loadout" },
+  { id: 117, name: "Mettle of Man", desc: "Equip Mettle of Man. Activate it by taking 3 protection hits. Survive.", diff: "hard", type: "mixed" },
+  { id: 118, name: "Anti-Slug Brigade", desc: "Equip Unbreakable + Soul Guard + Tenacity. Recover from dying state and escape the trial.", diff: "hard", type: "loadout" },
+  { id: 119, name: "Boon Relay", desc: "Equip Circle of Healing. Bless a totem 3 separate times in one trial (re-bless after killer snuffs).", diff: "hard", type: "mixed" },
+  { id: 120, name: "Escape Artist", desc: "Equip Smash Hit. Stun the killer and use the speed boost to reach a god pallet or strong tile.", diff: "hard", type: "mixed" },
+  { id: 121, name: "No Mither + Object", desc: "Equip both No Mither and Object of Obsession. Survive for at least 7 minutes.", diff: "hard", type: "loadout" },
+  { id: 122, name: "Autodidact Doctor", desc: "Equip Autodidact. Stack it to 5 tokens in a single trial.", diff: "hard", type: "mixed" },
+  { id: 123, name: "Sole Survivor Clutch", desc: "Equip Sole Survivor. Be the last alive, and escape using the aura-block to avoid the killer.", diff: "hard", type: "mixed" },
+  { id: 124, name: "We're Gonna Live Forever", desc: "Equip WGLF. Get 4 stacks (protection hits + safe unhooks) in a single trial.", diff: "hard", type: "mixed" },
+  { id: 125, name: "Flashbang Crafter", desc: "Equip Flashbang. Craft and use 2 flashbangs successfully in one trial.", diff: "hard", type: "mixed" },
+  { id: 126, name: "Red Herring Bait", desc: "Equip Red Herring. Trigger the loud noise notification on a gen and be hiding when the killer arrives. Do this 3 times.", diff: "hard", type: "mixed" },
+  { id: 127, name: "No-Addon Run", desc: "Bring an item with zero add-ons equipped and still escape the trial using that item effectively.", diff: "hard", type: "loadout" },
+  { id: 128, name: "Tank Build", desc: "Equip Mettle of Man + Dead Hard + Borrowed Time + We're Gonna Live Forever. Take 4+ hits for teammates. Escape.", diff: "hard", type: "loadout" },
+  { id: 129, name: "All Bones", desc: "Personally cleanse or bless all 5 totems in a single trial.", diff: "hard", type: "gameplay" },
+  { id: 130, name: "Blindness Match", desc: "Equip no aura-reading perks. Play the whole trial relying purely on game sense. Escape.", diff: "hard", type: "loadout" },
+  { id: 131, name: "Dramatic Hatch", desc: "Be on death hook, be the last one alive, and escape through the hatch.", diff: "hard", type: "gameplay" },
+  { id: 132, name: "Pallet Stun to Escape", desc: "While in the exit gate area, stun the killer with the exit gate pallet and then leave.", diff: "hard", type: "gameplay" },
+  { id: 133, name: "Sacrifice Play", desc: "Die on hook intentionally to give the last 2+ survivors time to escape (they must actually escape).", diff: "hard", type: "gameplay" },
+  { id: 134, name: "Full Boon Build", desc: "Equip 4 Boon perks. Bless at least 3 totems and provide your team with meaningful value. Escape.", diff: "hard", type: "loadout" },
+  { id: 135, name: "Babysitter Run", desc: "Unhook 3 survivors and ensure all 3 survive for at least 30 seconds after their unhook.", diff: "hard", type: "gameplay" },
+  { id: 136, name: "Exhaustion Collector", desc: "Equip 2 different exhaustion perks. Get value from both of them in the same trial.", diff: "hard", type: "loadout" },
+  { id: 137, name: "Scratch Mirror Survivor", desc: "Equip Alert. Call out every killer action (break, kick, vault) to your team and escape.", diff: "hard", type: "mixed" },
+  { id: 138, name: "The Floor is Lava", desc: "Never drop a pallet during the entire trial. Rely only on windows and line-of-sight. Escape.", diff: "hard", type: "gameplay" },
+  { id: 139, name: "Appraisal Expert", desc: "Equip Appraisal. Rummage a searched chest 3 times in a single trial.", diff: "hard", type: "mixed" },
+  { id: 140, name: "Solidarity Strats", desc: "Equip Solidarity. Heal a teammate while injured to heal yourself simultaneously. Do this twice.", diff: "hard", type: "mixed" },
+  { id: 141, name: "End Game Hero", desc: "During the End Game Collapse, unhook a survivor and both escape.", diff: "hard", type: "gameplay" },
+  { id: 142, name: "30k Trial", desc: "Earn 30,000+ bloodpoints in a single trial.", diff: "hard", type: "gameplay" },
+  { id: 143, name: "Object Runner", desc: "Equip Object of Obsession. Loop the killer for a total of 90 seconds across all chases. Escape.", diff: "hard", type: "mixed" },
+  { id: 144, name: "Background Player Save", desc: "Equip Background Player. Sprint to a nearby hook and take a hit or block for the unhooker.", diff: "hard", type: "mixed" },
+  { id: 145, name: "Overcome & Disappear", desc: "Equip Overcome. When hit, use the extended sprint to completely lose the killer. Do it twice.", diff: "hard", type: "mixed" },
+  { id: 146, name: "Deadline Tension", desc: "Equip Deadline. Repair a generator while on death hook and complete it.", diff: "hard", type: "mixed" },
+  { id: 147, name: "All-or-Nothing Sabo", desc: "Bring a toolbox with sabo add-ons. Sabotage 3 hooks in one trial.", diff: "hard", type: "loadout" },
+  { id: 148, name: "Resurgence Rescue", desc: "Equip Resurgence. Get unhooked and immediately start healing someone else before fully healing yourself.", diff: "hard", type: "mixed" },
+  { id: 149, name: "Lucky Break Disappearance", desc: "Equip Lucky Break. Get hit and vanish — lose the killer using the scratch/blood suppression. Do it twice.", diff: "hard", type: "mixed" },
+  { id: 150, name: "Iridescent Unbroken", desc: "Escape a trial with an Iridescent emblem in the Unbroken category.", diff: "hard", type: "gameplay" },
+ 
+  // ═══════════════════════════════════════════
+  //  NIGHTMARE (50 challenges)
+  // ═══════════════════════════════════════════
+  { id: 151, name: "No Mither Naked Run", desc: "Equip No Mither as your ONLY perk. No items. No add-ons. Escape the trial.", diff: "nightmare", type: "loadout" },
+  { id: 152, name: "The Pacifist", desc: "Escape the trial without dropping a single pallet, vaulting a single window during chase, or stunning the killer.", diff: "nightmare", type: "gameplay" },
+  { id: 153, name: "True Solo", desc: "Zero perks, zero items, zero add-ons, zero offerings. Escape the trial.", diff: "nightmare", type: "loadout" },
+  { id: 154, name: "120-Second Chase", desc: "Loop the killer for a full 2 minutes in a single unbroken chase. No going down.", diff: "nightmare", type: "gameplay" },
+  { id: 155, name: "Triple Flashlight Save", desc: "Get 3 flashlight saves in a single trial.", diff: "nightmare", type: "gameplay" },
+  { id: 156, name: "No Mither + Oggetto + Solo Q", desc: "Equip No Mither + Object of Obsession. Play solo queue. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 157, name: "5-Gen Looper", desc: "Loop the killer while all 5 generators are completed by your team. Then escape.", diff: "nightmare", type: "gameplay" },
+  { id: 158, name: "Immersed Perfection", desc: "Escape without the killer ever seeing your aura, hearing your noise, or chasing you for more than 5 seconds total.", diff: "nightmare", type: "gameplay" },
+  { id: 159, name: "4 Sabo Saves", desc: "Sabotage hooks to cause the killer to drop a survivor 3 times total across one trial. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 160, name: "Power Struggle Clutch", desc: "Equip Power Struggle + Flip-Flop + Tenacity + Any Means Necessary. Actually trigger Power Struggle and escape the trial.", diff: "nightmare", type: "loadout" },
+  { id: 161, name: "Unbreakable Universe", desc: "Equip Unbreakable + Soul Guard + Tenacity + No Mither. Pick yourself up and escape.", diff: "nightmare", type: "loadout" },
+  { id: 162, name: "Zero-Detect Escape", desc: "Escape the trial without ever triggering Killer Instinct, Aura Reading, or being in a chase longer than 10 seconds.", diff: "nightmare", type: "gameplay" },
+  { id: 163, name: "The Basement Dweller", desc: "Go to the basement at the start of the trial. Stay within the basement building for 3 minutes. Escape the trial.", diff: "nightmare", type: "meme" },
+  { id: 164, name: "No Mither Bodyguard", desc: "Equip No Mither. Take 3 protection hits for teammates. Escape.", diff: "nightmare", type: "mixed" },
+  { id: 165, name: "One Perk Wonder", desc: "Equip only Self-Care (no other perks, no items). Self-heal 3 times and escape.", diff: "nightmare", type: "loadout" },
+  { id: 166, name: "Hatch Standoff Victor", desc: "Be the last alive, find the hatch, wait for the killer to close it, then open an exit gate and escape.", diff: "nightmare", type: "gameplay" },
+  { id: 167, name: "The Meme Dream Build", desc: "Equip No Mither + Self-Care + Solidarity + Buckle Up. Escape the trial.", diff: "nightmare", type: "meme" },
+  { id: 168, name: "Boil Over Killer", desc: "Equip Boil Over + Flip-Flop + Power Struggle + Tenacity. Wiggle free at least twice. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 169, name: "Gen Jockey Supreme", desc: "Complete 5 generators (be present from start to finish on each one). Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 170, name: "Full Altruist", desc: "Unhook 4+ times, heal 4+ health states, take 2+ protection hits. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 171, name: "For the People Chain", desc: "Equip For the People. Use it twice in one trial and escape.", diff: "nightmare", type: "mixed" },
+  { id: 172, name: "Object of Obsession Adept", desc: "Equip Object of Obsession + 2 other random perks (spin a wheel). Escape.", diff: "nightmare", type: "loadout" },
+  { id: 173, name: "Reverse Stealth", desc: "Run directly at the killer at the start. Get chased. Loop for 60 seconds. Escape the trial.", diff: "nightmare", type: "meme" },
+  { id: 174, name: "The Librarian", desc: "Equip Diversion + Deception + Red Herring + Quick & Quiet. Create 5 fake notifications. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 175, name: "Sole Survivor Victory Lap", desc: "All 3 other survivors die. You are on death hook. Escape through the exit gate (not hatch).", diff: "nightmare", type: "gameplay" },
+  { id: 176, name: "No Scratch, No Problem", desc: "Walk (never run) for the entire trial. No scratch marks ever. Escape.", diff: "nightmare", type: "meme" },
+  { id: 177, name: "Autodidact Max", desc: "Equip Autodidact. Get 5 stacks and heal 3 survivors using only skill checks (no med-kits). Escape.", diff: "nightmare", type: "mixed" },
+  { id: 178, name: "Pallet Stun Only Chase", desc: "Loop the killer for 60 seconds using ONLY pallet stuns (no windows, no LOS). Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 179, name: "Locker Build", desc: "Equip Head On + Quick & Quiet + Inner Healing + Deception. Use all 4 perks effectively. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 180, name: "Zero Hit Escape", desc: "Escape the trial without being hit by the killer a single time.", diff: "nightmare", type: "gameplay" },
+  { id: 181, name: "Endurance Gauntlet", desc: "Get hit 8+ times total in a trial (endurance hits + normal) and still escape.", diff: "nightmare", type: "gameplay" },
+  { id: 182, name: "Pebble Sniper", desc: "Equip Diversion. Hit the killer directly with the pebble 3 times. Escape.", diff: "nightmare", type: "meme" },
+  { id: 183, name: "Death Hook Hero", desc: "While on death hook, unhook 2 survivors and escape the trial.", diff: "nightmare", type: "gameplay" },
+  { id: 184, name: "No Mither Adept", desc: "Equip No Mither + Dead Hard + any survivor's other 2 teachables. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 185, name: "Boil Over Mountain", desc: "Equip Boil Over. Get downed on the highest point of the map. Wiggle free. Escape.", diff: "nightmare", type: "mixed" },
+  { id: 186, name: "Complete Silence", desc: "Equip Iron Will + Calm Spirit. Never fast-vault, never scream, never run within 16m of the killer. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 187, name: "Flashbang Comedian", desc: "Equip Flashbang + Blast Mine. Blind the killer with both in the same trial. Escape.", diff: "nightmare", type: "mixed" },
+  { id: 188, name: "Endgame Rescue & Escape", desc: "During the End Game Collapse, unhook a survivor from basement and both escape.", diff: "nightmare", type: "gameplay" },
+  { id: 189, name: "Invisible Escape", desc: "Equip Distortion + Off the Record + Lucky Break + Poised. Escape without ever being seen after being hit.", diff: "nightmare", type: "loadout" },
+  { id: 190, name: "Meme Team: All Boons", desc: "Equip 4 Boon perks. Bless all 5 totems at least once during the trial. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 191, name: "David vs Goliath", desc: "No perks, no items. Loop the killer for a total of 2 minutes. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 192, name: "First Chase, Last Standing", desc: "Be the first person found by the killer. Be the last person to escape the trial.", diff: "nightmare", type: "gameplay" },
+  { id: 193, name: "Deliverance into DS", desc: "Equip Deliverance + Decisive Strike. Unhook someone, then Kobe with Deliverance, then hit DS if tunneled. Escape.", diff: "nightmare", type: "mixed" },
+  { id: 194, name: "Full Meme: Object + No Mither + Self-Care", desc: "Equip Object of Obsession + No Mither + Self-Care + any perk. The self-care is useless. Escape anyway.", diff: "nightmare", type: "meme" },
+  { id: 195, name: "The Cockroach", desc: "Get hooked 2 times (go to second stage). Use Decisive Strike, Unbreakable, or Deliverance. Escape the trial.", diff: "nightmare", type: "gameplay" },
+  { id: 196, name: "4-Minute Chase", desc: "Be in chase with the killer for a combined 4 minutes total in one trial. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 197, name: "Wiggle King", desc: "Wiggle free from the killer's grasp 2 times in a single trial (any method). Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 198, name: "Survive With Friends... Not", desc: "Solo queue. Zero meta perks (no DS, no DH, no BT, no UB, no OTR, no WoO). Escape.", diff: "nightmare", type: "loadout" },
+  { id: 199, name: "Perfect Game", desc: "Escape with Iridescent emblems in ALL 4 categories.", diff: "nightmare", type: "gameplay" },
+  { id: 200, name: "The Entity Denies You", desc: "Equip No Mither + Object of Obsession + Self-Care + Solidarity. No items. Solo queue. Escape. Become legend.", diff: "nightmare", type: "meme" },
+];
+ 
+// ——— APP ———
+const app = document.getElementById('app');
+ 
+let activeFilters = { diff: new Set(["easy","medium","hard","nightmare"]), type: new Set(["gameplay","loadout","mixed","meme"]) };
+let history = [];
+let currentResult = null;
+ 
+function getFiltered() {
+  return CHALLENGES.filter(c => activeFilters.diff.has(c.diff) && activeFilters.type.has(c.type));
+}
+ 
+function spin() {
+  const pool = getFiltered();
+  if (pool.length === 0) return;
+  // Exclude recent history
+  const recentIds = new Set(history.slice(0, 10).map(h => h.id));
+  let available = pool.filter(c => !recentIds.has(c.id));
+  if (available.length === 0) available = pool;
+  const pick = available[Math.floor(Math.random() * available.length)];
+  currentResult = pick;
+  history.unshift(pick);
+  if (history.length > 30) history.pop();
+  render();
+  // Animate
+  const card = document.querySelector('.result-card');
+  if (card) {
+    card.classList.remove('visible');
+    setTimeout(() => card.classList.add('visible'), 30);
+  }
+}
+ 
+function toggleFilter(category, value) {
+  const set = activeFilters[category];
+  if (set.has(value)) set.delete(value);
+  else set.add(value);
+  if (set.size === 0) set.add(value); // prevent all-off
+  render();
+}
+ 
+function clearHistory() {
+  history = [];
+  currentResult = null;
+  render();
+}
+ 
+function diffLabel(d) {
+  return { easy: "Easy", medium: "Medium", hard: "Hard", nightmare: "Nightmare" }[d];
+}
+function typeLabel(t) {
+  return { gameplay: "Gameplay", loadout: "Loadout", mixed: "Mixed", meme: "Meme" }[t];
+}
+ 
+function render() {
+  const pool = getFiltered();
+  app.innerHTML = `
+    <div class="header">
+      <h1>Survivor Challenge Roulette</h1>
+      <div class="subtitle">Dead by Daylight</div>
+      <div class="count">${pool.length} challenges in pool · ${CHALLENGES.length} total</div>
+    </div>
+ 
+    <div class="filters">
+      ${["easy","medium","hard","nightmare"].map(d => `
+        <button class="filter-btn ${activeFilters.diff.has(d)?'active':''}" data-diff="${d}" onclick="toggleFilter('diff','${d}')">${diffLabel(d)}</button>
+      `).join('')}
+      ${["gameplay","loadout","mixed","meme"].map(t => `
+        <button class="filter-btn ${activeFilters.type.has(t)?'active':''}" onclick="toggleFilter('type','${t}')">${typeLabel(t)}</button>
+      `).join('')}
+    </div>
+ 
+    <div class="spin-section">
+      <button class="spin-btn" onclick="spin()">⛧ SPIN ⛧</button>
+    </div>
+ 
+    ${currentResult ? `
+      <div class="result-card visible" data-diff="${currentResult.diff}">
+        <div class="result-number">Challenge #${currentResult.id}</div>
+        <div class="result-title">${currentResult.name}</div>
+        <div class="result-desc">${currentResult.desc}</div>
+        <div class="result-tags">
+          <span class="tag tag-diff" data-d="${currentResult.diff}">${diffLabel(currentResult.diff)}</span>
+          <span class="tag tag-type">${typeLabel(currentResult.type)}</span>
+        </div>
+      </div>
+    ` : `
+      <div class="result-card visible" style="text-align:center;opacity:0.5;border-style:dashed;">
+        <div class="result-desc">Hit SPIN to receive your fate from the Entity...</div>
+      </div>
+    `}
+ 
+    ${history.length > 0 ? `
+      <div class="history-section">
+        <div class="history-title">☠ History ☠</div>
+        <div class="history-list">
+          ${history.map((h, i) => `
+            <div class="history-item" style="animation-delay:${i*0.04}s">
+              <span class="h-num">#${h.id}</span>
+              <span class="h-name">${h.name}</span>
+              <span class="h-diff" data-d="${h.diff}">${diffLabel(h.diff)}</span>
+            </div>
+          `).join('')}
+        </div>
+        <button class="clear-btn" onclick="clearHistory()">Clear History</button>
+      </div>
+    ` : ''}
+  `;
+}
+ 
+render();
+</script>
+</body>
+</html>
