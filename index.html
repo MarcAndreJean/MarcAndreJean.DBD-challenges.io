@@ -565,14 +565,141 @@ const CHALLENGES = [
   { id: 221, name: "Laurie's Nightmare", desc: "Equip Object of Obsession + Decisive Strike + Sole Survivor + Adrenaline. Play as Laurie. Escape.", diff: "hard", type: "loadout" },
   { id: 222, name: "The Tinkerer", desc: "Equip Repressed Alliance + Potential Energy + Blast Mine + Red Herring. Control gens and confuse the killer. Escape.", diff: "hard", type: "loadout" },
   { id: 223, name: "Teamwork Duo", desc: "Equip Teamwork: Power of Two + Teamwork: Collective Stealth + We'll Make It + Empathy. Stick with a partner. Escape.", diff: "hard", type: "loadout" },
+
+  // ═══════════════════════════════════════════
+  //  EASY (224–234)
+  // ═══════════════════════════════════════════
+  { id: 224, name: "Cartographer", desc: "Visit every corner of the map (all 4 quadrants). Escape.", diff: "easy", type: "gameplay" },
+  { id: 225, name: "Back to Sender", desc: "Drop an item you brought at the exit gate for the killer as a gift. Escape.", diff: "easy", type: "meme" },
+  { id: 226, name: "The Spectator", desc: "Witness a teammate stun the killer (be within 16m when it happens). Escape.", diff: "easy", type: "gameplay" },
+  { id: 227, name: "Second-Hand Shopper", desc: "Escape the trial with an item you found in a chest (not one you brought).", diff: "easy", type: "gameplay" },
+  { id: 228, name: "No Crouch Zone", desc: "Never press crouch the entire trial. Escape.", diff: "easy", type: "meme" },
+  { id: 229, name: "Copycat", desc: "Equip the same character and cosmetics as another player in your lobby. Escape.", diff: "easy", type: "meme" },
+  { id: 230, name: "Lucky Offering", desc: "Burn a Luck offering and attempt to Kobe at least once.", diff: "easy", type: "mixed" },
+  { id: 231, name: "Pallet Salesman", desc: "Point or gesture at a pallet while a teammate is being chased nearby.", diff: "easy", type: "meme" },
+  { id: 232, name: "Wrong Neighborhood", desc: "Run into the killer's terror radius on purpose, wave, then leave. Escape.", diff: "easy", type: "meme" },
+  { id: 233, name: "No Left Turns", desc: "During chases, only loop clockwise. Escape.", diff: "easy", type: "meme" },
+  { id: 234, name: "Rookie Detective", desc: "Identify which perks the killer is running by watching their actions. Find two perks to win.", diff: "easy", type: "mixed" },
+
+  // ═══════════════════════════════════════════
+  //  MEDIUM (235–240)
+  // ═══════════════════════════════════════════
+  { id: 235, name: "Loyalty Test", desc: "Stick with the same survivor for the entire trial. If they go down, attempt the rescue. Escape.", diff: "medium", type: "gameplay" },
+  { id: 236, name: "Wrong Build, Right Results", desc: "Randomize your entire loadout (perks, item, add-ons, offering). Escape.", diff: "medium", type: "loadout" },
+  { id: 237, name: "The Courier", desc: "Pick up an item, carry it across the map, and drop it for a teammate who needs it. Escape.", diff: "medium", type: "meme" },
+  { id: 238, name: "Licensed Only", desc: "Play a licensed character with only their own unique perks. Escape.", diff: "medium", type: "loadout" },
+  { id: 239, name: "Speed Dating", desc: "Touch every other survivor in the trial at least once (heal, unhook, or co-op a gen). Escape.", diff: "medium", type: "meme" },
+  { id: 240, name: "Blood Pact Duo", desc: "Equip Blood Pact. Activate its haste effect with the Obsession and run together. Escape.", diff: "medium", type: "mixed" },
+
+  // ═══════════════════════════════════════════
+  //  HARD (214–247)
+  // ═══════════════════════════════════════════
+  { id: 241, name: "Three-Gen Buster", desc: "The killer is defending a three-gen. Break it by completing one of the contested generators. Escape.", diff: "hard", type: "gameplay" },
+  { id: 242, name: "Clean Sweep", desc: "Escape having used every pallet you encountered at least once (loop it before dropping it).", diff: "hard", type: "gameplay" },
+  { id: 243, name: "Chest Keeper", desc: "Equip Plunderer's + Appraisal. Search more chests than any other survivor. Escape with a purple or better item.", diff: "hard", type: "loadout" },
+  { id: 244, name: "The Stalker", desc: "Follow the killer around the map without being caught for an extended period. Escape.", diff: "hard", type: "meme" },
+  { id: 245, name: "Reverse Pizza Dwight", desc: "Play as Dwight. Every time you see a teammate, you must run to them and co-op whatever they're doing. Escape.", diff: "hard", type: "meme" },
+  { id: 246, name: "Lost and Found", desc: "Drop your item at the start of the trial. Find it again later and escape with it.", diff: "hard", type: "meme" },
+  { id: 247, name: "Legacy Build", desc: "Equip only perks from the original 4 survivors (Dwight, Meg, Claudette, Jake) on any character. Escape.", diff: "hard", type: "loadout" },
+
+  // ═══════════════════════════════════════════
+  //  NIGHTMARE (248–260)
+  // ═══════════════════════════════════════════
+  { id: 248, name: "Human Shield", desc: "Take a protection hit for every other survivor at least once during the trial. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 249, name: "The Janitor", desc: "Cleanse every totem. Open every chest. Leave the map spotless. Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 250, name: "Dying Light Runner", desc: "Equip Object of Obsession. Be the obsession. Get chased first. Be the last out. No teammates die.", diff: "nightmare", type: "mixed" },
+  { id: 251, name: "No Mither Medic", desc: "Equip No Mither + Empathy + Botany Knowledge + We'll Make It. You can't be healed. Heal everyone else. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 252, name: "Endurance Collector", desc: "Trigger endurance from at least two different sources in one trial (BT, OTR, Mettle, etc.). Escape.", diff: "nightmare", type: "gameplay" },
+  { id: 253, name: "Killer's Shadow", desc: "Follow the killer for an extended period without being detected. Escape.", diff: "nightmare", type: "meme" },
+  { id: 254, name: "One Perk, Worst Perk", desc: "Equip only Deja Vu as your sole perk. No items. Escape.", diff: "nightmare", type: "loadout" },
+  { id: 255, name: "The Announcer v2", desc: "Point at the killer every single time you see them. Never stop pointing until they chase you or leave. Escape.", diff: "nightmare", type: "meme" },
+  { id: 256, name: "Locker Collector", desc: "Enter every locker you see on the map. Escape.", diff: "nightmare", type: "meme" },
+  { id: 257, name: "The Hoarder", desc: "Pick up every item you find on the ground. Carry as many as possible to the exit gate area. Escape.", diff: "nightmare", type: "meme" },
+  { id: 258, name: "Forbidden Friendship", desc: "Get the killer to nod or shake their head at you. Escape.", diff: "nightmare", type: "meme" },
+  { id: 259, name: "Head On Party", desc: "Equip Head On + Quick & Quiet + Flashbang + Deception. Stun the killer with Head On while another survivor blinds them. Escape.", diff: "nightmare", type: "mixed" },
+  { id: 260, name: "Private Detective", desc: "Identify which perks the killer is running by watching their actions. Find all perks to win.", diff: "easy", type: "mixed" },
+
+  // ═══════════════════════════════════════════
+  //  MEME / FUNNY — EASY (261–265)
+  // ═══════════════════════════════════════════
+  { id: 261, name: "The Bodyguard", desc: "Pick one random teammate in the lobby. They are your VIP. Protect them all game. They must escape.", diff: "easy", type: "meme" },
+  { id: 262, name: "The Applause", desc: "Every time a gen pops, stop what you're doing and point in celebration. Escape.", diff: "easy", type: "meme" },
+  { id: 262, name: "Gen Etiquette", desc: "You must wave or beckon at a survivor before joining their generator. If they leave, you leave too. Escape.", diff: "easy", type: "meme" },
+  { id: 263, name: "Item Swap Meet", desc: "Bring an item. Drop it next to a teammate who has an item. Pick up theirs. Escape with the traded item.", diff: "easy", type: "meme" },
+  { id: 264, name: "Wardrobe Malfunction", desc: "Equip mismatched cosmetics from three different outfits. The uglier, the better. Escape.", diff: "easy", type: "meme" },
+  { id: 265, name: "Haunted Tourist", desc: "Visit the basement, nod at the hooks, and leave. Do this at least once. Escape.", diff: "easy", type: "meme" },
+
+  // ═══════════════════════════════════════════
+  //  MEME / FUNNY — MEDIUM (266–274)
+  // ═══════════════════════════════════════════
+  { id: 266, name: "The Real Estate Agent", desc: "Visit every major structure on the map (shack, main building, all unique tiles). Tour complete. Escape.", diff: "medium", type: "meme" },
+  { id: 267, name: "The Doppelgänger", desc: "Mimic the exact movement of a nearby survivor for an extended period. Do what they do. Escape.", diff: "medium", type: "meme" },
+  { id: 268, name: "Locker Sommelier", desc: "Equip Head On. Enter a locker, wait for the killer, then stun them. Nod afterward. Escape.", diff: "medium", type: "meme" },
+  { id: 269, name: "The Packhorse", desc: "Bring two add-ons on your item. Use the item. Drop it. Find another item. Carry that instead. Escape with the new item.", diff: "medium", type: "meme" },
+  { id: 270, name: "Sorry, Wrong Locker", desc: "Equip Quick & Quiet. Enter a locker right next to the killer, then sneak out when they walk away.", diff: "medium", type: "meme" },
+  { id: 271, name: "Simon Says", desc: "Whatever the first survivor you see does, you must do next (if they heal, you heal; if they vault, you vault). Escape.", diff: "medium", type: "meme" },
+  { id: 272, name: "The Union Worker", desc: "Only work on gens while healthy. The moment you're injured, stop all gen work until healed. Escape.", diff: "medium", type: "meme" },
+  { id: 273, name: "Pallet Connoisseur", desc: "Before dropping any pallet, you must loop it at least twice first. You respect every pallet. Escape.", diff: "medium", type: "meme" },
+  { id: 274, name: "Perimeter Patrol", desc: "Run a full lap of the map edge before escaping.", diff: "nightmare", type: "meme" },
+
+  // ═══════════════════════════════════════════
+  //  MEME / FUNNY — HARD (275–278)
+  // ═══════════════════════════════════════════
+  { id: 275, name: "Walking Simulator", desc: "Never sprint unless the killer is actively chasing you. Walk everywhere else. Escape.", diff: "hard", type: "meme" },
+  { id: 276, name: "Naruto Runner", desc: "Only run in straight lines. No curves or loops — just straight sprints and hard 90-degree turns. Escape.", diff: "hard", type: "meme" },
+  { id: 277, name: "Always Injured", desc: "Get injured as soon as possible. Never heal. Do everything injured. Escape.", diff: "hard", type: "meme" },
+  { id: 278, name: "The Gardener", desc: "Bless or cleanse every totem you see before touching anything else. The fog must be purified. Escape.", diff: "hard", type: "meme" },
+
+  // ═══════════════════════════════════════════
+  //  MEME / FUNNY — NIGHTMARE (279–285)
+  // ═══════════════════════════════════════════
+  { id: 279, name: "Nod Protocol", desc: "Nod at the killer every time they look at you. Every single time. Escape.", diff: "nightmare", type: "meme" },
+  { id: 280, name: "The Sommelier Returns", desc: "Open every chest you find. Examine the item. Drop it. It wasn't good enough. Escape with no item.", diff: "nightmare", type: "meme" },
+  { id: 281, name: "Gen Roulette", desc: "Spin your camera with eyes closed, run in that direction, and the first gen you find is the one you must complete. Repeat each time. Escape.", diff: "nightmare", type: "meme" },
+  { id: 282, name: "Full Cosplay", desc: "Play as a licensed character. You must roleplay as them — Ash must be cocky, Laurie must be cautious, Steve must protect Nancy. Escape.", diff: "nightmare", type: "meme" },
+  { id: 283, name: "Pilgrimage", desc: "Visit the basement shrine (hooks). Bow (crouch). Leave an item. Then escape the trial.", diff: "nightmare", type: "meme" },
+  { id: 284, name: "One Hand Only", desc: "Play using only your mouse and W (going forward) for moving. Escape.", diff: "nightmare", type: "meme" },
+  { id: 285, name: "Monke Brain", desc: "Equip no perks. See pallet? Drop it. See window? Vault it. See chest? Open it. See totem? Cleanse it. Zero strategy. Pure instinct. Escape.", diff: "nightmare", type: "meme" },
 ];
+
+// ——— PERSISTENCE ———
+function saveHistory() {
+  const data = JSON.stringify(history);
+  try { document.cookie = "challengeHistory=" + encodeURIComponent(data) + ";path=/;max-age=31536000;SameSite=Lax"; } catch(e) {}
+  try { sessionStorage.setItem("challengeHistory", data); } catch(e) {}
+}
+
+function loadHistory() {
+  // Try cookie first
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)challengeHistory=([^;]*)/);
+    if (match) {
+      const parsed = JSON.parse(decodeURIComponent(match[1]));
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  // Fall back to session storage
+  try {
+    const raw = sessionStorage.getItem("challengeHistory");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return [];
+}
+
+function clearStoredHistory() {
+  try { document.cookie = "challengeHistory=;path=/;max-age=0;SameSite=Lax"; } catch(e) {}
+  try { sessionStorage.removeItem("challengeHistory"); } catch(e) {}
+}
 
 // ——— APP ———
 const app = document.getElementById('app');
  
 let activeFilters = { diff: new Set(["easy","medium","hard","nightmare"]), type: new Set(["gameplay","loadout","mixed","meme"]) };
-let history = [];
-let currentResult = null;
+let history = loadHistory();
+let currentResult = history.length > 0 ? history[0] : null;
  
 function getFiltered() {
   return CHALLENGES.filter(c => activeFilters.diff.has(c.diff) && activeFilters.type.has(c.type));
@@ -589,6 +716,7 @@ function spin() {
   currentResult = pick;
   history.unshift(pick);
   if (history.length > 30) history.pop();
+  saveHistory();
   render();
   // Animate
   const card = document.querySelector('.result-card');
@@ -609,6 +737,7 @@ function toggleFilter(category, value) {
 function clearHistory() {
   history = [];
   currentResult = null;
+  clearStoredHistory();
   render();
 }
  
